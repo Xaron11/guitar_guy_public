@@ -31,11 +31,17 @@ void LoadMap(const char *filename) {
     else if (strstr(line, "Artist"))
       sscanf(line, "Artist = \"%99[^\"]\"", songArtist);
     else if (strstr(line, "= N")) {
-      int tick = 0, column = 0;
+      int tick = 0;
+      int column = 0;
       if (sscanf(line, "%d = N %d", &tick, &column) == 2) {
         if (noteCount < MAX_NOTES && column >= 0 && column < NUM_COLUMNS) {
+          if (resolution <= 0) {
+            TraceLog(LOG_ERROR, "Invalid resolution: %d", resolution);
+            fclose(file);
+            return;
+          }
           float beat = (float)tick / resolution;
-          float seconds = (tempo / 1000000.0f) * beat + offset;
+          float seconds = ((float)tempo / 1000000.0f) * beat + offset;
           notes[noteCount++] = (Note){column, seconds, true};
         }
       }
