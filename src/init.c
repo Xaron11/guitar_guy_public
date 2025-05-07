@@ -6,5 +6,6 @@
 void GameInit(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "C Game");
   SetTargetFPS(60);
+  SetExitKey(0);
   LoadMap("assets/song1.chart");
 }

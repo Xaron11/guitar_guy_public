@@ -1,4 +1,7 @@
 #include "draw.h"
+#include "game.h"
+#include "map.h"
+#include "raygui.h"
 #include "types.h"
 #include <raylib.h>
 
@@ -15,14 +18,16 @@ void DrawColumnLines() {
   }
 }
 
-void DrawButtons() {
+void DrawButtons(bool enableVisuals) {
   for (int i = 0; i < NUM_COLUMNS; i++) {
     float x = (float)((i + 1) * SCREEN_WIDTH) / (NUM_COLUMNS + 1);
     Color c = BUTTON_COLORS[i];
-    if (IsKeyDown(BUTTON_KEYS[i]))
-      c = Fade(c, 0.5f);
-    if (keyHitVisual[i])
-      c = WHITE;
+    if (enableVisuals) {
+      if (IsKeyDown(BUTTON_KEYS[i]))
+        c = Fade(c, 0.5f);
+      if (keyHitVisual[i])
+        c = WHITE;
+    }
     Vector2 buttonPos = {x, (float)(SCREEN_HEIGHT - 50)};
     DrawRing(buttonPos, NOTE_RADIUS, NOTE_RADIUS + 5, 0, 360, 32, c);
   }
@@ -40,4 +45,41 @@ void DrawNotes() {
     DrawCircleLines((int)x, (int)noteY, NOTE_RADIUS,
                     BUTTON_COLORS[notes[i].column]);
   }
+}
+
+void DrawScoreUI() {
+  DrawText("SCORE", GetScreenWidth() / 2 - MeasureText("SCORE", 24) / 2, 40, 24,
+           GRAY);
+  DrawText(TextFormat("%d", score),
+           GetScreenWidth() / 2 - MeasureText(TextFormat("%d", score), 64) / 2,
+           70, 64, YELLOW);
+  if (GetCombo() > 0) {
+    DrawText(TextFormat("COMBO: %d", GetCombo()),
+             GetScreenWidth() / 2 -
+                 MeasureText(TextFormat("COMBO: %d", GetCombo()), 36) / 2,
+             140, 36, ORANGE);
+  }
+  if (GetMultiplier() > 1) {
+    DrawText(TextFormat("x%d", GetMultiplier()),
+             GetScreenWidth() / 2 -
+                 MeasureText(TextFormat("x%d", GetMultiplier()), 48) / 2,
+             180, 48, RED);
+  }
+}
+
+void DrawSongInfo() {
+  DrawText(songTitle, 20, 40, 20, LIGHTGRAY);
+  DrawText(songArtist, 20, 65, 18, DARKGRAY);
+}
+
+void DrawProgressBar() {
+  int notesHit = 0;
+  for (int i = 0; i < noteCount; i++) {
+    if (!notes[i].active)
+      notesHit++;
+  }
+  float progress =
+      (noteCount > 0) ? ((float)notesHit / (float)noteCount) : 0.0f;
+  Rectangle barBounds = {40.0f, 8.0f, (float)(GetScreenWidth() - 80), 24.0f};
+  GuiProgressBar(barBounds, "", "", &progress, 0.0f, 1.0f);
 }

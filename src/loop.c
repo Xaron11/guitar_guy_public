@@ -13,51 +13,57 @@ extern char songTitle[128];
 extern char songArtist[128];
 
 void GameLoop(void) {
+  bool paused = false;
+  int resumeCountdown = 0;
+  float resumeTimer = 0.0f;
   while (!WindowShouldClose()) {
-    float delta = GetFrameTime();
-    songTime += delta;
-    UpdateInput(delta);
-
+    if (!paused && IsKeyPressed(KEY_ESCAPE)) {
+      paused = true;
+    } else if (paused && IsKeyPressed(KEY_ESCAPE)) {
+      resumeCountdown = 3; // seconds
+      resumeTimer = 0.0f;
+      paused = false;
+    }
+    if (!paused && resumeCountdown == 0) {
+      float delta = GetFrameTime();
+      songTime += delta;
+      UpdateInput(delta);
+    }
     BeginDrawing();
     ClearBackground(BLACK);
-
     DrawColumnLines();
-    DrawText("SCORE", GetScreenWidth() / 2 - MeasureText("SCORE", 24) / 2, 40,
-             24, GRAY);
-    DrawText(TextFormat("%d", score),
-             GetScreenWidth() / 2 -
-                 MeasureText(TextFormat("%d", score), 64) / 2,
-             70, 64, YELLOW);
-
-    if (GetCombo() > 0) {
-      DrawText(TextFormat("COMBO: %d", GetCombo()),
-               GetScreenWidth() / 2 -
-                   MeasureText(TextFormat("COMBO: %d", GetCombo()), 36) / 2,
-               140, 36, ORANGE);
-    }
-    if (GetMultiplier() > 1) {
-      DrawText(TextFormat("x%d", GetMultiplier()),
-               GetScreenWidth() / 2 -
-                   MeasureText(TextFormat("x%d", GetMultiplier()), 48) / 2,
-               180, 48, RED);
-    }
-
-    DrawText(songTitle, 20, 40, 20, LIGHTGRAY);
-    DrawText(songArtist, 20, 65, 18, DARKGRAY);
-
-    int notesHit = 0;
-    for (int i = 0; i < noteCount; i++) {
-      if (!notes[i].active)
-        notesHit++;
-    }
-    float progress =
-        (noteCount > 0) ? ((float)notesHit / (float)noteCount) : 0.0f;
-    Rectangle barBounds = {40.0f, 8.0f, (float)(GetScreenWidth() - 80), 24.0f};
-    GuiProgressBar(barBounds, "", "", &progress, 0.0f, 1.0f);
-
-    DrawButtons();
+    DrawScoreUI();
+    DrawSongInfo();
+    DrawProgressBar();
+    DrawButtons(!paused && resumeCountdown == 0);
     DrawNotes();
-
+    if (paused) {
+      DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(),
+                    Fade(BLACK, 0.6f));
+      DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 64) / 2,
+               GetScreenHeight() / 2 - 32, 64, YELLOW);
+      DrawText("Press ESC to resume",
+               GetScreenWidth() / 2 -
+                   MeasureText("Press ESC to resume", 24) / 2,
+               GetScreenHeight() / 2 + 40, 24, GRAY);
+    } else if (resumeCountdown > 0) {
+      resumeTimer += GetFrameTime();
+      if (resumeTimer >= 1.0f) {
+        resumeCountdown--;
+        resumeTimer = 0.0f;
+      }
+      if (resumeCountdown > 0) {
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%d", resumeCountdown);
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(),
+                      Fade(BLACK, 0.5f));
+        DrawText(buf, GetScreenWidth() / 2 - MeasureText(buf, 96) / 2,
+                 GetScreenHeight() / 2 - 48, 96, YELLOW);
+      }
+    }
     EndDrawing();
+    if (resumeCountdown > 0) {
+      continue;
+    }
   }
 }
