@@ -18,7 +18,7 @@ static int comboThresholds[] = {5, 10, 20}; // x2 at 5, x3 at 10, x4 at 20
 int GetCombo(void) { return combo; }
 int GetMultiplier(void) { return multiplier; }
 
-static void updateKeyTimers(float delta) {
+static void UpdateKeyTimers(float delta) {
   for (int i = 0; i < NUM_COLUMNS; i++) {
     if (keyTimers[i] > 0)
       keyTimers[i] -= delta;
@@ -30,7 +30,7 @@ static void updateKeyTimers(float delta) {
   }
 }
 
-static bool tryHitNote(int col) {
+static bool TryHitNote(int col) {
   for (int j = 0; j < noteCount; j++) {
     if (!notes[j].active || notes[j].column != col)
       continue;
@@ -56,12 +56,12 @@ static bool tryHitNote(int col) {
   return false;
 }
 
-static bool processKeyPresses(void) {
+static bool ProcessKeyPresses(void) {
   bool hit = false;
   for (int i = 0; i < NUM_COLUMNS; i++) {
     if (IsKeyPressed(BUTTON_KEYS[i]) && keyTimers[i] <= 0) {
       keyTimers[i] = KEY_DELAY;
-      if (tryHitNote(i)) {
+      if (TryHitNote(i)) {
         hit = true;
       }
     }
@@ -69,7 +69,7 @@ static bool processKeyPresses(void) {
   return hit;
 }
 
-static void checkMiss(bool hit) {
+static void CheckMiss(bool hit) {
   if (!hit) {
     for (int i = 0; i < NUM_COLUMNS; i++) {
       if (IsKeyPressed(BUTTON_KEYS[i])) {
@@ -82,7 +82,7 @@ static void checkMiss(bool hit) {
 }
 
 void UpdateInput(float delta) {
-  updateKeyTimers(delta);
-  bool hit = processKeyPresses();
-  checkMiss(hit);
+  UpdateKeyTimers(delta);
+  bool hit = ProcessKeyPresses();
+  CheckMiss(hit);
 }
