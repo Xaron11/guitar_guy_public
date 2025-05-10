@@ -38,14 +38,7 @@ void GameLoop(void) {
     DrawButtons(!paused && resumeCountdown == 0);
     DrawNotes();
     if (paused) {
-      DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(),
-                    Fade(BLACK, 0.6f));
-      DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 64) / 2,
-               GetScreenHeight() / 2 - 32, 64, YELLOW);
-      DrawText("Press ESC to resume",
-               GetScreenWidth() / 2 -
-                   MeasureText("Press ESC to resume", 24) / 2,
-               GetScreenHeight() / 2 + 40, 24, GRAY);
+      DrawPauseOverlay();
     } else if (resumeCountdown > 0) {
       resumeTimer += GetFrameTime();
       if (resumeTimer >= 1.0f) {
@@ -53,12 +46,7 @@ void GameLoop(void) {
         resumeTimer = 0.0f;
       }
       if (resumeCountdown > 0) {
-        char buf[16];
-        snprintf(buf, sizeof(buf), "%d", resumeCountdown);
-        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(),
-                      Fade(BLACK, 0.5f));
-        DrawText(buf, GetScreenWidth() / 2 - MeasureText(buf, 96) / 2,
-                 GetScreenHeight() / 2 - 48, 96, YELLOW);
+        DrawResumeCountdown(resumeCountdown);
       }
     }
     EndDrawing();

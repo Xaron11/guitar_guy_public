@@ -4,6 +4,7 @@
 #include "raygui.h"
 #include "types.h"
 #include <raylib.h>
+#include <stdio.h>
 
 extern float songTime;
 extern float keyHitTimers[NUM_COLUMNS];
@@ -82,4 +83,21 @@ void DrawProgressBar() {
       (noteCount > 0) ? ((float)notesHit / (float)noteCount) : 0.0f;
   Rectangle barBounds = {40.0f, 8.0f, (float)(GetScreenWidth() - 80), 24.0f};
   GuiProgressBar(barBounds, "", "", &progress, 0.0f, 1.0f);
+}
+
+void DrawPauseOverlay(void) {
+  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.6f));
+  DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 64) / 2,
+           GetScreenHeight() / 2 - 32, 64, YELLOW);
+  DrawText("Press ESC to resume",
+           GetScreenWidth() / 2 - MeasureText("Press ESC to resume", 24) / 2,
+           GetScreenHeight() / 2 + 40, 24, GRAY);
+}
+
+void DrawResumeCountdown(int seconds) {
+  char buf[16];
+  snprintf(buf, sizeof(buf), "%d", seconds);
+  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.5f));
+  DrawText(buf, GetScreenWidth() / 2 - MeasureText(buf, 96) / 2,
+           GetScreenHeight() / 2 - 48, 96, YELLOW);
 }
