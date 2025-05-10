@@ -41,7 +41,7 @@ void GameLoop(void) {
                    MeasureText("A simple rhythm game", 24) / 2,
                180, 24, GRAY);
       bool playPressed =
-          GuiButton((Rectangle){btnX, btnY, btnWidth, btnHeight}, "Play");
+          GuiButton((Rectangle){btnX, btnY, btnWidth, btnHeight}, "PLAY");
       if (playPressed) {
         GameReset();
         state = STATE_PLAYING;
