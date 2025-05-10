@@ -82,6 +82,7 @@ void DrawProgressBar() {
   float progress =
       (noteCount > 0) ? ((float)notesHit / (float)noteCount) : 0.0f;
   Rectangle barBounds = {40.0f, 8.0f, (float)(GetScreenWidth() - 80), 24.0f};
+
   GuiProgressBar(barBounds, "", "", &progress, 0.0f, 1.0f);
 }
 

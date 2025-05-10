@@ -21,5 +21,6 @@ extern int combo;
 extern int multiplier;
 int GetCombo(void);
 int GetMultiplier(void);
+void GameReset(void);
 
 #endif  // GAME_H

@@ -38,7 +38,6 @@ static bool TryHitNote(int col) {
     if (dt < HIT_WINDOW / 300.0f && dt > -HIT_WINDOW / 300.0f) {
       notes[j].active = false;
       combo++;
-      // Update multiplier
       if (combo >= comboThresholds[2])
         multiplier = 4;
       else if (combo >= comboThresholds[1])
@@ -85,4 +84,19 @@ void UpdateInput(float delta) {
   UpdateKeyTimers(delta);
   bool hit = ProcessKeyPresses();
   CheckMiss(hit);
+}
+
+void GameReset(void) {
+  score = 0;
+  combo = 0;
+  multiplier = 1;
+  songTime = 0.0f;
+  for (int i = 0; i < NUM_COLUMNS; i++) {
+    keyTimers[i] = 0.0f;
+    keyHitVisual[i] = false;
+    keyHitTimers[i] = 0.0f;
+  }
+  for (int i = 0; i < noteCount; i++) {
+    notes[i].active = true;
+  }
 }
