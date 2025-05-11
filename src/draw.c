@@ -74,13 +74,7 @@ void DrawSongInfo() {
 }
 
 void DrawProgressBar() {
-  int notesHit = 0;
-  for (int i = 0; i < noteCount; i++) {
-    if (!notes[i].active)
-      notesHit++;
-  }
-  float progress =
-      (noteCount > 0) ? ((float)notesHit / (float)noteCount) : 0.0f;
+  float progress = GetSongProgress();
   Rectangle barBounds = {40.0f, 8.0f, (float)(GetScreenWidth() - 80), 24.0f};
 
   GuiProgressBar(barBounds, "", "", &progress, 0.0f, 1.0f);

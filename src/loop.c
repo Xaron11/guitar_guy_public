@@ -28,7 +28,8 @@ void GameLoop(void) {
     ClearBackground(BLACK);
 
     if (state == STATE_MENU) {
-      bool playPressed = false, exitPressed = false;
+      bool playPressed = false;
+      bool exitPressed = false;
       DrawMainMenu(&playPressed, &exitPressed);
       if (playPressed) {
         GameReset();
@@ -57,12 +58,7 @@ void GameLoop(void) {
       DrawButtons(state == STATE_PLAYING && resumeCountdown == 0);
       DrawNotes();
       // Return to menu after song is finished
-      int notesLeft = 0;
-      for (int i = 0; i < noteCount; i++) {
-        if (notes[i].active)
-          notesLeft++;
-      }
-      if (state == STATE_PLAYING && notesLeft == 0) {
+      if (state == STATE_PLAYING && IsSongFinished()) {
         state = STATE_MENU;
       }
       if (state == STATE_PAUSED) {

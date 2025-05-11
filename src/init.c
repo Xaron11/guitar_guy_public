@@ -1,4 +1,5 @@
 #include "init.h"
+#include "game.h"
 #include "map.h"
 #include "raygui.h"
 #include "types.h"
@@ -9,6 +10,7 @@ void GameInit(void) {
   SetTargetFPS(60);
   SetExitKey(0);
   LoadMap("assets/song1.chart");
+  CalculateSongDuration();
 
   // Set global raygui styles
   GuiSetStyle(DEFAULT, TEXT_SIZE, 28);

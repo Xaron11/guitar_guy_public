@@ -10,6 +10,7 @@
 void UpdateInput(float delta);
 extern int score;
 extern float songTime;
+extern float songDuration;
 extern float keyTimers[NUM_COLUMNS];
 extern bool keyHitVisual[NUM_COLUMNS];
 extern float keyHitTimers[NUM_COLUMNS];
@@ -22,5 +23,8 @@ extern int multiplier;
 int GetCombo(void);
 int GetMultiplier(void);
 void GameReset(void);
+void CalculateSongDuration(void);
+float GetSongProgress(void);
+bool IsSongFinished(void);
 
 #endif  // GAME_H

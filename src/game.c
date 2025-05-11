@@ -15,8 +15,18 @@ int multiplier = 1;
 
 static int comboThresholds[] = {5, 10, 20}; // x2 at 5, x3 at 10, x4 at 20
 
+float songDuration = 0.0f;
+
 int GetCombo(void) { return combo; }
 int GetMultiplier(void) { return multiplier; }
+
+void CalculateSongDuration(void) {
+  songDuration = 0.0f;
+  for (int i = 0; i < noteCount; i++) {
+    if (notes[i].time > songDuration)
+      songDuration = notes[i].time;
+  }
+}
 
 static void UpdateKeyTimers(float delta) {
   for (int i = 0; i < NUM_COLUMNS; i++) {
@@ -100,3 +110,14 @@ void GameReset(void) {
     notes[i].active = true;
   }
 }
+
+float GetSongProgress(void) {
+  if (songDuration <= 0.0f)
+    return 0.0f;
+  float progress = songTime / songDuration;
+  if (progress > 1.0f)
+    progress = 1.0f;
+  return progress;
+}
+
+bool IsSongFinished(void) { return songTime >= songDuration; }
