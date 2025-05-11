@@ -102,3 +102,24 @@ void DrawResumeCountdown(int seconds) {
   DrawText(buf, GetScreenWidth() / 2 - MeasureText(buf, 96) / 2,
            GetScreenHeight() / 2 - 48, 96, YELLOW);
 }
+
+void DrawMainMenu(bool *playPressed, bool *exitPressed) {
+  const char *title = "C-GAME";
+  int titleFontSize = 64;
+  int btnWidth = 200;
+  int btnHeight = 60;
+  int btnX = GetScreenWidth() / 2 - btnWidth / 2;
+  int btnY = GetScreenHeight() / 2 - btnHeight / 2 + 60;
+  int exitBtnY = btnY + btnHeight + 30;
+  DrawText(title, GetScreenWidth() / 2 - MeasureText(title, titleFontSize) / 2,
+           100, titleFontSize, YELLOW);
+  DrawText("A simple rhythm game",
+           GetScreenWidth() / 2 - MeasureText("A simple rhythm game", 24) / 2,
+           180, 24, GRAY);
+  *playPressed = GuiButton(
+      (Rectangle){(float)btnX, (float)btnY, (float)btnWidth, (float)btnHeight},
+      "PLAY");
+  *exitPressed = GuiButton((Rectangle){(float)btnX, (float)exitBtnY,
+                                       (float)btnWidth, (float)btnHeight},
+                           "EXIT");
+}

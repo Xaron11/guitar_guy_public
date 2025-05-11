@@ -21,30 +21,20 @@ void GameLoop(void) {
   GameState state = STATE_MENU;
   int resumeCountdown = 0;
   float resumeTimer = 0.0f;
+  bool shouldExit = false;
 
-  while (!WindowShouldClose()) {
+  while (!WindowShouldClose() && !shouldExit) {
     BeginDrawing();
     ClearBackground(BLACK);
 
     if (state == STATE_MENU) {
-      const char *title = "C-GAME";
-      int titleFontSize = 64;
-      int btnWidth = 200;
-      int btnHeight = 60;
-      int btnX = GetScreenWidth() / 2 - btnWidth / 2;
-      int btnY = GetScreenHeight() / 2 - btnHeight / 2 + 60;
-      DrawText(title,
-               GetScreenWidth() / 2 - MeasureText(title, titleFontSize) / 2,
-               100, titleFontSize, YELLOW);
-      DrawText("A simple rhythm game",
-               GetScreenWidth() / 2 -
-                   MeasureText("A simple rhythm game", 24) / 2,
-               180, 24, GRAY);
-      bool playPressed =
-          GuiButton((Rectangle){btnX, btnY, btnWidth, btnHeight}, "PLAY");
+      bool playPressed = false, exitPressed = false;
+      DrawMainMenu(&playPressed, &exitPressed);
       if (playPressed) {
         GameReset();
         state = STATE_PLAYING;
+      } else if (exitPressed) {
+        shouldExit = true;
       }
     } else if (state == STATE_PLAYING || state == STATE_PAUSED ||
                state == STATE_RESUME) {
@@ -66,6 +56,15 @@ void GameLoop(void) {
       DrawProgressBar();
       DrawButtons(state == STATE_PLAYING && resumeCountdown == 0);
       DrawNotes();
+      // Return to menu after song is finished
+      int notesLeft = 0;
+      for (int i = 0; i < noteCount; i++) {
+        if (notes[i].active)
+          notesLeft++;
+      }
+      if (state == STATE_PLAYING && notesLeft == 0) {
+        state = STATE_MENU;
+      }
       if (state == STATE_PAUSED) {
         DrawPauseOverlay();
       } else if (state == STATE_RESUME) {
