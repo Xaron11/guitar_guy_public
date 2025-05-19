@@ -12,12 +12,7 @@ extern char songTitle[128];
 extern char songArtist[128];
 
 void GameLoop(void) {
-  typedef enum {
-    STATE_MENU,
-    STATE_PLAYING,
-    STATE_PAUSED,
-    STATE_RESUME
-  } GameState;
+
   GameState state = STATE_MENU;
   int resumeCountdown = 0;
   float resumeTimer = 0.0f;
