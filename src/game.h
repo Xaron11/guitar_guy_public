@@ -6,6 +6,7 @@
 #include "types.h"
 
 #define BASE_SCORE 100
+#define DEFAULT_SONG_OFFSET 3.0f
 
 void UpdateInput(float delta);
 extern int score;

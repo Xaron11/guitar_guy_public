@@ -1,4 +1,5 @@
 #include "game.h"
+#include "map.h"
 #include "types.h"
 #include <raylib.h>
 
@@ -100,7 +101,7 @@ void GameReset(void) {
   score = 0;
   combo = 0;
   multiplier = 1;
-  songTime = 0.0f;
+  songTime = -(offset + DEFAULT_SONG_OFFSET);
   for (int i = 0; i < NUM_COLUMNS; i++) {
     keyTimers[i] = 0.0f;
     keyHitVisual[i] = false;
