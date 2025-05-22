@@ -9,8 +9,6 @@ void GameInit(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "C Game");
   SetTargetFPS(60);
   SetExitKey(0);
-  LoadMap("assets/song1.chart");
-  CalculateSongDuration();
 
   // Set global raygui styles
   GuiSetStyle(DEFAULT, TEXT_SIZE, 20);                   // Default text size

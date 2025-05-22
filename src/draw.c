@@ -128,3 +128,28 @@ void DrawMainMenu(bool *playPressed, bool *exitPressed) {
                            "EXIT");
   GuiSetStyle(DEFAULT, TEXT_SIZE, prevStyle);
 }
+
+void DrawLevelSelectMenu(bool *song1Pressed, bool *song2Pressed,
+                         bool *backPressed) {
+  int screenWidth = GetScreenWidth();
+  int screenHeight = GetScreenHeight();
+  int btnWidth = 320;
+  int btnHeight = 70;
+  int spacing = 40;
+  int yStart = screenHeight / 2 - btnHeight - spacing / 2;
+  int x = screenWidth / 2 - btnWidth / 2;
+
+  DrawText("Select Level",
+           screenWidth / 2 - MeasureText("Select Level", 48) / 2, 100, 48,
+           YELLOW);
+
+  *song1Pressed = GuiButton(
+      (Rectangle){(float)x, (float)yStart, (float)btnWidth, (float)btnHeight},
+      "Song 1");
+  *song2Pressed =
+      GuiButton((Rectangle){(float)x, (float)(yStart + btnHeight + spacing),
+                            (float)btnWidth, (float)btnHeight},
+                "Song 2");
+  *backPressed = GuiButton(
+      (Rectangle){40.0f, (float)screenHeight - 80.0f, 180.0f, 50.0f}, "BACK");
+}

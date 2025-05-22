@@ -2,22 +2,55 @@
 #include "draw.h"
 #include "game.h"
 #include "loop.h"
+#include "map.h"
 #include <raylib.h>
+#include <stddef.h>
+
+static const char *currentSong = NULL;
+static bool songLoaded = false;
+
+void SetCurrentSong(const char *songPath) {
+  currentSong = songPath;
+  songLoaded = false;
+}
 
 GameState HandleMenuState(bool *shouldExit) {
   bool playPressed = false;
   bool exitPressed = false;
   DrawMainMenu(&playPressed, &exitPressed);
   if (playPressed) {
-    GameReset();
-    return STATE_PLAYING;
+    return STATE_LEVEL_SELECT;
   } else if (exitPressed) {
     *shouldExit = true;
   }
   return STATE_MENU;
 }
 
+GameState HandleLevelSelectState(bool *backToMenu, char **selectedSong) {
+  bool song1Pressed = false;
+  bool song2Pressed = false;
+  bool backPressed = false;
+  DrawLevelSelectMenu(&song1Pressed, &song2Pressed, &backPressed);
+  if (song1Pressed) {
+    *selectedSong = "assets/song1.chart";
+    return STATE_PLAYING;
+  } else if (song2Pressed) {
+    *selectedSong = "assets/song2.chart";
+    return STATE_PLAYING;
+  } else if (backPressed) {
+    *backToMenu = true;
+    return STATE_MENU;
+  }
+  return STATE_LEVEL_SELECT;
+}
+
 GameState HandlePlayingState(void) {
+  if (!songLoaded && currentSong) {
+    LoadMap(currentSong);
+    CalculateSongDuration();
+    GameReset();
+    songLoaded = true;
+  }
   if (IsKeyPressed(KEY_ESCAPE)) {
     return STATE_PAUSED;
   }
@@ -31,6 +64,7 @@ GameState HandlePlayingState(void) {
   DrawButtons(true);
   DrawNotes();
   if (IsSongFinished()) {
+    songLoaded = false;
     return STATE_MENU;
   }
   return STATE_PLAYING;

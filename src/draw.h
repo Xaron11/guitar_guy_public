@@ -13,5 +13,7 @@ void DrawPauseOverlay(void);
 void DrawPauseOverlayWithExit(bool *exitPressed);
 void DrawResumeCountdown(int seconds);
 void DrawMainMenu(bool *playPressed, bool *exitPressed);
+void DrawLevelSelectMenu(bool *song1Pressed, bool *song2Pressed,
+                         bool *backPressed);
 
 #endif  // DRAW_H
