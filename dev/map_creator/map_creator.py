@@ -38,7 +38,7 @@ def collect_note_events(midi):
 
 def generate_chart_sections(midi_path, midi):
     """
-    Build the [Song], [SyncTrack], and [ExpertSingle] sections as strings.
+    Build the [Song] and [Track] sections as strings.
     """
     base = os.path.splitext(os.path.basename(midi_path))[0]
     # file format: name - artist.mid
@@ -106,8 +106,8 @@ def main():
         print("Usage: python map_creator.py input.mid")
         sys.exit(1)
 
-    midi_path  = f'./input/{sys.argv[1]}'
-    chart_path = f'./output/{os.path.splitext(sys.argv[1])[0]}.chart'
+    midi_path  = f'./{sys.argv[1]}'
+    chart_path = f'./output/{os.path.splitext(os.path.basename(midi_path))[0]}.chart'
 
     if not os.path.isfile(midi_path):
         print(f"Error: MIDI file '{midi_path}' not found.")
