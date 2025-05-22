@@ -43,7 +43,11 @@ GameState HandlePausedState(int *resumeCountdown, float *resumeTimer) {
   DrawProgressBar();
   DrawButtons(false);
   DrawNotes();
-  DrawPauseOverlay();
+  bool exitPressed = false;
+  DrawPauseOverlayWithExit(&exitPressed);
+  if (exitPressed) {
+    return STATE_MENU;
+  }
   if (IsKeyPressed(KEY_ESCAPE)) {
     *resumeCountdown = 3;
     *resumeTimer = 0.0f;

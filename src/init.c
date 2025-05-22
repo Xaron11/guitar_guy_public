@@ -13,7 +13,7 @@ void GameInit(void) {
   CalculateSongDuration();
 
   // Set global raygui styles
-  GuiSetStyle(DEFAULT, TEXT_SIZE, 28);
+  GuiSetStyle(DEFAULT, TEXT_SIZE, 20);                   // Default text size
   GuiSetStyle(BUTTON, BASE_COLOR_NORMAL, 0xFFFF00FF);    // YELLOW
   GuiSetStyle(BUTTON, BASE_COLOR_FOCUSED, 0xFFD700FF);   // GOLD (hover)
   GuiSetStyle(BUTTON, BASE_COLOR_PRESSED, 0xFFD766FF);   // dark GOLD (pressed)

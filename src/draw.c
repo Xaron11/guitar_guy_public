@@ -81,12 +81,19 @@ void DrawProgressBar() {
 }
 
 void DrawPauseOverlay(void) {
+  bool dummy = false;
+  DrawPauseOverlayWithExit(&dummy);
+}
+
+void DrawPauseOverlayWithExit(bool *exitPressed) {
   DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.6f));
   DrawText("PAUSED", GetScreenWidth() / 2 - MeasureText("PAUSED", 64) / 2,
            GetScreenHeight() / 2 - 32, 64, YELLOW);
   DrawText("Press ESC to resume",
            GetScreenWidth() / 2 - MeasureText("Press ESC to resume", 24) / 2,
            GetScreenHeight() / 2 + 40, 24, GRAY);
+  *exitPressed = GuiButton((Rectangle){10, GetScreenHeight() - 60, 200, 50},
+                           "EXIT TO MENU");
 }
 
 void DrawResumeCountdown(int seconds) {
@@ -110,10 +117,14 @@ void DrawMainMenu(bool *playPressed, bool *exitPressed) {
   DrawText("A simple rhythm game",
            GetScreenWidth() / 2 - MeasureText("A simple rhythm game", 24) / 2,
            180, 24, GRAY);
+
+  int prevStyle = GuiGetStyle(DEFAULT, TEXT_SIZE);
+  GuiSetStyle(DEFAULT, TEXT_SIZE, 28);
   *playPressed = GuiButton(
       (Rectangle){(float)btnX, (float)btnY, (float)btnWidth, (float)btnHeight},
       "PLAY");
   *exitPressed = GuiButton((Rectangle){(float)btnX, (float)exitBtnY,
                                        (float)btnWidth, (float)btnHeight},
                            "EXIT");
+  GuiSetStyle(DEFAULT, TEXT_SIZE, prevStyle);
 }

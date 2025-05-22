@@ -10,6 +10,7 @@ void DrawScoreUI(void);
 void DrawSongInfo(void);
 void DrawProgressBar(void);
 void DrawPauseOverlay(void);
+void DrawPauseOverlayWithExit(bool *exitPressed);
 void DrawResumeCountdown(int seconds);
 void DrawMainMenu(bool *playPressed, bool *exitPressed);
 
