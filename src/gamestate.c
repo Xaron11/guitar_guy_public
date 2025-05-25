@@ -25,27 +25,30 @@ void LoadSongMetadata(const char *filename, SongEntry *entry) {
   entry->artist[0] = '\0';
   entry->duration = 0.0f;
   int inSongSection = 0;
-  char *line = strtok(text, "\n");
+  char *saveptr = NULL;
+  const char *line = strtok_r(text, "\n", &saveptr);
   while (line) {
     if (strstr(line, "[Song]")) {
       inSongSection = 1;
-      line = strtok(NULL, "\n");
+      line = strtok_r(NULL, "\n", &saveptr);
       continue;
     }
     if (inSongSection && line[0] == '[')
       break;
     if (inSongSection) {
-      if (strstr(line, "Name"))
+      if (strstr(line, "Name")) {
         sscanf(line, "Name = \"%127[^\"]\"", entry->title);
-      else if (strstr(line, "Artist"))
+      } else if (strstr(line, "Artist")) {
         sscanf(line, "Artist = \"%127[^\"]\"", entry->artist);
-      else if (strstr(line, "Notes")) {
-        int notes = 0;
-        if (sscanf(line, "Notes = %d", &notes) == 1)
-          entry->duration = (float)notes; // Placeholder: can be improved
       }
     }
-    line = strtok(NULL, "\n");
+    if (inSongSection && strstr(line, "Notes")) {
+      int notes = 0;
+      if (sscanf(line, "Notes = %d", &notes) == 1) {
+        entry->duration = (float)notes; // Placeholder: can be improved
+      }
+    }
+    line = strtok_r(NULL, "\n", &saveptr);
   }
   UnloadFileText(text);
 }
@@ -57,7 +60,7 @@ void ScanAvailableSongs(GameContext *ctx) {
     ctx->songList.count = 0;
   }
   FilePathList files = LoadDirectoryFilesEx(SONGS_DIR, ".chart", false);
-  int count = 0;
+  size_t count = 0;
   for (unsigned int i = 0; i < files.count; i++) {
     if (IsFileExtension(files.paths[i], ".chart"))
       count++;
@@ -68,14 +71,14 @@ void ScanAvailableSongs(GameContext *ctx) {
     UnloadDirectoryFiles(files);
     return;
   }
-  ctx->songList.entries = (SongEntry *)malloc(sizeof(SongEntry) * count);
+  SongEntry *entries = (SongEntry *)calloc(count, sizeof(SongEntry));
+  ctx->songList.entries = entries;
   ctx->songList.count = count;
-  int idx = 0;
-  for (unsigned int i = 0; i < files.count; i++) {
+  size_t idx = 0;
+  for (unsigned int i = 0; i < files.count && idx < count; i++) {
     if (IsFileExtension(files.paths[i], ".chart")) {
-      SongEntry *entry = &ctx->songList.entries[idx];
-      strncpy(entry->path, files.paths[i], sizeof(entry->path) - 1);
-      entry->path[sizeof(entry->path) - 1] = '\0';
+      SongEntry *entry = &entries[idx];
+      snprintf(entry->path, sizeof(entry->path), "%s", files.paths[i]);
       LoadSongMetadata(files.paths[i], entry);
       idx++;
     }
@@ -90,7 +93,8 @@ void SetCurrentSong(GameContext *ctx, int songIdx) {
   ctx->songLoaded = false;
 }
 
-GameState HandleMenuState(GameContext *ctx, bool *shouldExit) {
+GameState HandleMenuState(const GameContext *ctx, bool *shouldExit) {
+  (void)ctx; // Unused
   bool playPressed = false;
   bool exitPressed = false;
   DrawMainMenu(&playPressed, &exitPressed);
@@ -102,7 +106,7 @@ GameState HandleMenuState(GameContext *ctx, bool *shouldExit) {
   return STATE_MENU;
 }
 
-GameState HandleLevelSelectState(GameContext *ctx, bool *backToMenu,
+GameState HandleLevelSelectState(const GameContext *ctx, bool *backToMenu,
                                  int *selectedSongIdx) {
   static int selectedIdx = -1;
   *backToMenu = false;
@@ -165,7 +169,7 @@ GameState HandlePlayingState(GameContext *ctx) {
   return STATE_PLAYING;
 }
 
-GameState HandlePausedState(GameContext *ctx, int *resumeCountdown,
+GameState HandlePausedState(const GameContext *ctx, int *resumeCountdown,
                             float *resumeTimer) {
   DrawColumnLines();
   DrawScoreUI(&ctx->gameState);
@@ -186,7 +190,7 @@ GameState HandlePausedState(GameContext *ctx, int *resumeCountdown,
   return STATE_PAUSED;
 }
 
-GameState HandleResumeState(GameContext *ctx, int *resumeCountdown,
+GameState HandleResumeState(const GameContext *ctx, int *resumeCountdown,
                             float *resumeTimer) {
   DrawColumnLines();
   DrawScoreUI(&ctx->gameState);

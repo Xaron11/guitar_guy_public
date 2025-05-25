@@ -1,5 +1,4 @@
 #include "game.h"
-#include "map.h"
 #include "types.h"
 #include <raylib.h>
 
@@ -8,11 +7,12 @@
 static int comboThresholds[] = {5, 10, 20}; // x2 at 5, x3 at 10, x4 at 20
 
 void CalculateSongDuration(Song *song) {
-  song->duration = 0.0f;
+  float maxTime = 0.0f;
   for (int i = 0; i < song->noteCount; i++) {
-    if (song->notes[i].time > song->duration)
-      song->duration = song->notes[i].time;
+    if (song->notes[i].time > maxTime)
+      maxTime = song->notes[i].time;
   }
+  song->duration = maxTime + 1.0f;
 }
 
 void GameReset(GameStateData *state) {
@@ -21,9 +21,9 @@ void GameReset(GameStateData *state) {
   state->multiplier = 1;
   state->songTime = -(state->currentSong.offset + DEFAULT_SONG_OFFSET);
   for (int i = 0; i < NUM_COLUMNS; i++) {
-    state->keyTimers[i] = 0.0f;
     state->keyHitVisual[i] = false;
     state->keyHitTimers[i] = 0.0f;
+    state->keyTimers[i] = 0.0f;
   }
   for (int i = 0; i < state->currentSong.noteCount; i++) {
     state->currentSong.notes[i].active = true;

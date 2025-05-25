@@ -5,24 +5,14 @@
 #include <string.h>
 
 void LoadMap(const char *filename, Song *song) {
-  char *text = LoadFileText(filename);
-  if (!text) {
-    TraceLog(LOG_ERROR, "Failed to open map file");
-    return;
-  }
-  // Reset song data
   memset(song, 0, sizeof(Song));
-  strcpy(song->title, "Unknown");
-  strcpy(song->artist, "Unknown");
-  song->resolution = 192;
-  song->tempo = 500000;
-  song->offset = 0.0f;
-  song->noteCount = 0;
-
-  int inTrackSection = 0;
-  int currNote = 0;
+  char *text = LoadFileText(filename);
+  if (!text)
+    return;
   char *saveptr = NULL;
   const char *line = strtok_r(text, "\n", &saveptr);
+  int inTrackSection = 0;
+  int currNote = 0;
   while (line) {
     if (strstr(line, "[Track]")) {
       inTrackSection = 1;
@@ -50,16 +40,19 @@ void LoadMap(const char *filename, Song *song) {
       int tick = 0;
       int column = 0;
       if (sscanf(line, "%d = N %d", &tick, &column) == 2 &&
-          currNote < song->noteCount && column >= 0 && column < NUM_COLUMNS &&
+          currNote < MAX_NOTES && column >= 0 && column < NUM_COLUMNS &&
           song->resolution > 0) {
         float beat = (float)tick / (float)song->resolution;
         float seconds = ((float)song->tempo / 1000000.0f) * beat + song->offset;
-        song->notes[currNote++] = (Note){column, seconds, true};
+        song->notes[currNote].column = column;
+        song->notes[currNote].time = seconds;
+        song->notes[currNote].active = true;
+        currNote++;
       }
     }
     line = strtok_r(NULL, "\n", &saveptr);
   }
-
+  song->noteCount = currNote;
   CalculateSongDuration(song);
   UnloadFileText(text);
 }

@@ -2,6 +2,7 @@
 #define TYPES_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 #include "raylib.h"
 
@@ -23,6 +24,7 @@ typedef struct Note {
   bool active;
 } Note;
 
+// Song metadata and note data
 typedef struct {
   char title[128];
   char artist[128];
@@ -32,21 +34,24 @@ typedef struct {
   int difficulty;
   Note notes[MAX_NOTES];
   int noteCount;
-  float duration;
+  float duration;  // in seconds
 } Song;
 
+// Metadata for song selection
 typedef struct {
   char path[256];
   char title[128];
   char artist[128];
-  float duration;
+  float duration;  // in seconds
 } SongEntry;
 
+// List of available songs
 typedef struct {
   SongEntry *entries;
-  int count;
+  size_t count;
 } SongList;
 
+// State for the current game session
 typedef struct {
   int score;
   float songTime;
@@ -58,6 +63,7 @@ typedef struct {
   Song currentSong;
 } GameStateData;
 
+// Global game context
 typedef struct {
   SongList songList;
   GameStateData gameState;

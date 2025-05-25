@@ -4,7 +4,6 @@
 
 This is a simple Guitar Hero-style rhythm game built using [raylib](https://www.raylib.com/) in C. It supports a basic note map format, four key inputs, scoring, visual feedback, and displays the song title and artist.
 
-
 ## 🎮 Features
 
 - 4 playable columns: `A`, `S`, `D`, `F` keys
@@ -18,6 +17,7 @@ This is a simple Guitar Hero-style rhythm game built using [raylib](https://www.
 
 ## 📁 Map File Format
 Place map files in the `assets/` directory. Maps use the following `.chart` format:
+
 ```
 [Song]
 Name = "Song Title"
@@ -75,9 +75,10 @@ cd bin
 ```
 
 ## ⌨️ Controls
-| Key | Action         |
-| --- | -------------- |
-| A   | Hit left note  |
-| S   | Hit mid-left   |
-| D   | Hit mid-right  |
-| F   | Hit right note |
+| Key | Action        |
+| --- | ------------- |
+| A   | Green column  |
+| S   | Red column    |
+| D   | Blue column   |
+| F   | Yellow column |
+| ESC | Pause/Exit    |

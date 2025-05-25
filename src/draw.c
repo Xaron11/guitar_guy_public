@@ -1,6 +1,5 @@
 #include "draw.h"
 #include "game.h"
-#include "map.h"
 #include "raygui.h"
 #include "types.h"
 #include <raylib.h>
