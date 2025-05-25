@@ -16,7 +16,7 @@ This is a simple Guitar Hero-style rhythm game built using [raylib](https://www.
 - Uses `raylib` for graphics
 
 ## 📁 Map File Format
-Place map files in the `assets/` directory. Maps use the following `.chart` format:
+Place map files in the `assets/maps` directory. Maps use the following `.chart` format:
 
 ```
 [Song]

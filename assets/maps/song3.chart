@@ -1,0 +1,20 @@
+[Song]
+Name = "Test"
+Offset = 0
+Resolution = 192
+Difficulty = 1
+Tempo = 300000
+Notes = 10
+
+[Track]
+1824 = N 2
+1968 = N 1
+2112 = N 1
+2208 = N 0
+2304 = N 3
+2400 = N 2
+2496 = N 3
+2592 = N 3
+2688 = N 0
+2880 = N 2
+3024 = N 0
