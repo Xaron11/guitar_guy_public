@@ -10,11 +10,13 @@ extern char songTitle[128];
 extern char songArtist[128];
 
 void GameLoop(void) {
+  GameContext ctx = {0};
+  ScanAvailableSongs(&ctx);
   GameState state = STATE_MENU;
   int resumeCountdown = 0;
   float resumeTimer = 0.0f;
   bool shouldExit = false;
-  char *selectedSong = NULL;
+  int selectedSongIdx = -1;
   bool backToMenu = false;
 
   while (!WindowShouldClose() && !shouldExit) {
@@ -22,28 +24,28 @@ void GameLoop(void) {
     ClearBackground(BLACK);
     switch (state) {
     case STATE_MENU:
-      state = HandleMenuState(&shouldExit);
-      selectedSong = NULL;
+      state = HandleMenuState(&ctx, &shouldExit);
+      selectedSongIdx = -1;
       break;
     case STATE_LEVEL_SELECT:
-      state = HandleLevelSelectState(&backToMenu, &selectedSong);
+      state = HandleLevelSelectState(&ctx, &backToMenu, &selectedSongIdx);
       if (backToMenu) {
         state = STATE_MENU;
         backToMenu = false;
       }
       break;
     case STATE_PLAYING:
-      if (selectedSong) {
-        SetCurrentSong(selectedSong);
-        selectedSong = NULL;
+      if (selectedSongIdx >= 0) {
+        SetCurrentSong(&ctx, selectedSongIdx);
+        selectedSongIdx = -1;
       }
-      state = HandlePlayingState();
+      state = HandlePlayingState(&ctx);
       break;
     case STATE_PAUSED:
-      state = HandlePausedState(&resumeCountdown, &resumeTimer);
+      state = HandlePausedState(&ctx, &resumeCountdown, &resumeTimer);
       break;
     case STATE_RESUME:
-      state = HandleResumeState(&resumeCountdown, &resumeTimer);
+      state = HandleResumeState(&ctx, &resumeCountdown, &resumeTimer);
       break;
     }
     EndDrawing();

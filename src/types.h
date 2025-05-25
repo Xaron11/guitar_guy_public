@@ -23,4 +23,46 @@ typedef struct Note {
   bool active;
 } Note;
 
+typedef struct {
+  char title[128];
+  char artist[128];
+  int resolution;
+  int tempo;
+  float offset;
+  int difficulty;
+  Note notes[MAX_NOTES];
+  int noteCount;
+  float duration;
+} Song;
+
+typedef struct {
+  char path[256];
+  char title[128];
+  char artist[128];
+  float duration;
+} SongEntry;
+
+typedef struct {
+  SongEntry *entries;
+  int count;
+} SongList;
+
+typedef struct {
+  int score;
+  float songTime;
+  int combo;
+  int multiplier;
+  float keyTimers[NUM_COLUMNS];
+  bool keyHitVisual[NUM_COLUMNS];
+  float keyHitTimers[NUM_COLUMNS];
+  Song currentSong;
+} GameStateData;
+
+typedef struct {
+  SongList songList;
+  GameStateData gameState;
+  int currentSongIdx;
+  bool songLoaded;
+} GameContext;
+
 #endif  // TYPES_H

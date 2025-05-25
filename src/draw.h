@@ -3,17 +3,19 @@
 
 #include <stdbool.h>
 
+#include "types.h"
+
 void DrawColumnLines(void);
-void DrawButtons(bool enableVisuals);
-void DrawNotes(void);
-void DrawScoreUI(void);
-void DrawSongInfo(void);
-void DrawProgressBar(void);
+void DrawButtons(const GameStateData *state, bool enableVisuals);
+void DrawNotes(const GameStateData *state);
+void DrawScoreUI(const GameStateData *state);
+void DrawSongInfo(const GameStateData *state);
+void DrawProgressBar(const GameStateData *state);
 void DrawPauseOverlay(void);
 void DrawPauseOverlayWithExit(bool *exitPressed);
 void DrawResumeCountdown(int seconds);
 void DrawMainMenu(bool *playPressed, bool *exitPressed);
-void DrawLevelSelectMenu(bool *song1Pressed, bool *song2Pressed,
-                         bool *backPressed);
+void DrawLevelSelectMenu(const char **songNames, int songCount,
+                         int *selectedIdx, bool *backPressed);
 
 #endif  // DRAW_H

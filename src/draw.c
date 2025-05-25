@@ -6,12 +6,6 @@
 #include <raylib.h>
 #include <stdio.h>
 
-extern float songTime;
-extern float keyHitTimers[NUM_COLUMNS];
-extern bool keyHitVisual[NUM_COLUMNS];
-extern Note notes[MAX_NOTES];
-extern int noteCount;
-
 void DrawColumnLines() {
   for (int i = 0; i < NUM_COLUMNS; i++) {
     int x = (i + 1) * SCREEN_WIDTH / (NUM_COLUMNS + 1);
@@ -19,14 +13,14 @@ void DrawColumnLines() {
   }
 }
 
-void DrawButtons(bool enableVisuals) {
+void DrawButtons(const GameStateData *state, bool enableVisuals) {
   for (int i = 0; i < NUM_COLUMNS; i++) {
     float x = (float)((i + 1) * SCREEN_WIDTH) / (NUM_COLUMNS + 1);
     Color c = BUTTON_COLORS[i];
     if (enableVisuals) {
       if (IsKeyDown(BUTTON_KEYS[i]))
         c = Fade(c, 0.5f);
-      if (keyHitVisual[i])
+      if (state->keyHitVisual[i])
         c = WHITE;
     }
     Vector2 buttonPos = {x, (float)(SCREEN_HEIGHT - 50)};
@@ -34,47 +28,50 @@ void DrawButtons(bool enableVisuals) {
   }
 }
 
-void DrawNotes() {
-  for (int i = 0; i < noteCount; i++) {
-    if (!notes[i].active)
+void DrawNotes(const GameStateData *state) {
+  for (int i = 0; i < state->currentSong.noteCount; i++) {
+    if (!state->currentSong.notes[i].active)
       continue;
     float noteY =
-        (float)SCREEN_HEIGHT - 50 - ((notes[i].time - songTime) * 300.0f);
+        (float)SCREEN_HEIGHT - 50 -
+        ((state->currentSong.notes[i].time - state->songTime) * 300.0f);
     if (noteY > (float)SCREEN_HEIGHT || noteY < -NOTE_RADIUS)
       continue;
-    float x = (float)((notes[i].column + 1) * SCREEN_WIDTH) / (NUM_COLUMNS + 1);
+    float x = (float)((state->currentSong.notes[i].column + 1) * SCREEN_WIDTH) /
+              (NUM_COLUMNS + 1);
     DrawCircleLines((int)x, (int)noteY, NOTE_RADIUS,
-                    BUTTON_COLORS[notes[i].column]);
+                    BUTTON_COLORS[state->currentSong.notes[i].column]);
   }
 }
 
-void DrawScoreUI() {
+void DrawScoreUI(const GameStateData *state) {
   DrawText("SCORE", GetScreenWidth() / 2 - MeasureText("SCORE", 24) / 2, 40, 24,
            GRAY);
-  DrawText(TextFormat("%d", score),
-           GetScreenWidth() / 2 - MeasureText(TextFormat("%d", score), 64) / 2,
+  DrawText(TextFormat("%d", state->score),
+           GetScreenWidth() / 2 -
+               MeasureText(TextFormat("%d", state->score), 64) / 2,
            70, 64, YELLOW);
-  if (GetCombo() > 0) {
-    DrawText(TextFormat("COMBO: %d", GetCombo()),
+  if (state->combo > 0) {
+    DrawText(TextFormat("COMBO: %d", state->combo),
              GetScreenWidth() / 2 -
-                 MeasureText(TextFormat("COMBO: %d", GetCombo()), 36) / 2,
+                 MeasureText(TextFormat("COMBO: %d", state->combo), 36) / 2,
              140, 36, ORANGE);
   }
-  if (GetMultiplier() > 1) {
-    DrawText(TextFormat("x%d", GetMultiplier()),
+  if (state->multiplier > 1) {
+    DrawText(TextFormat("x%d", state->multiplier),
              GetScreenWidth() / 2 -
-                 MeasureText(TextFormat("x%d", GetMultiplier()), 48) / 2,
+                 MeasureText(TextFormat("x%d", state->multiplier), 48) / 2,
              180, 48, RED);
   }
 }
 
-void DrawSongInfo() {
-  DrawText(songTitle, 20, 40, 20, LIGHTGRAY);
-  DrawText(songArtist, 20, 65, 18, DARKGRAY);
+void DrawSongInfo(const GameStateData *state) {
+  DrawText(state->currentSong.title, 20, 40, 20, LIGHTGRAY);
+  DrawText(state->currentSong.artist, 20, 65, 18, DARKGRAY);
 }
 
-void DrawProgressBar() {
-  float progress = GetSongProgress();
+void DrawProgressBar(const GameStateData *state) {
+  float progress = GetSongProgress(state);
   Rectangle barBounds = {40.0f, 8.0f, (float)(GetScreenWidth() - 80), 24.0f};
 
   GuiProgressBar(barBounds, "", "", &progress, 0.0f, 1.0f);
@@ -129,27 +126,28 @@ void DrawMainMenu(bool *playPressed, bool *exitPressed) {
   GuiSetStyle(DEFAULT, TEXT_SIZE, prevStyle);
 }
 
-void DrawLevelSelectMenu(bool *song1Pressed, bool *song2Pressed,
-                         bool *backPressed) {
-  int screenWidth = GetScreenWidth();
-  int screenHeight = GetScreenHeight();
-  int btnWidth = 320;
-  int btnHeight = 70;
-  int spacing = 40;
-  int yStart = screenHeight / 2 - btnHeight - spacing / 2;
-  int x = screenWidth / 2 - btnWidth / 2;
-
-  DrawText("Select Level",
-           screenWidth / 2 - MeasureText("Select Level", 48) / 2, 100, 48,
-           YELLOW);
-
-  *song1Pressed = GuiButton(
-      (Rectangle){(float)x, (float)yStart, (float)btnWidth, (float)btnHeight},
-      "Song 1");
-  *song2Pressed =
-      GuiButton((Rectangle){(float)x, (float)(yStart + btnHeight + spacing),
-                            (float)btnWidth, (float)btnHeight},
-                "Song 2");
-  *backPressed = GuiButton(
-      (Rectangle){40.0f, (float)screenHeight - 80.0f, 180.0f, 50.0f}, "BACK");
+void DrawLevelSelectMenu(const char **songNames, int songCount,
+                         int *selectedIdx, bool *backPressed) {
+  int screenW = GetScreenWidth();
+  int screenH = GetScreenHeight();
+  int btnW = 400;
+  int btnH = 48;
+  int spacing = 16;
+  int totalH = songCount * (btnH + spacing) - spacing;
+  int baseY = screenH / 2 - totalH / 2;
+  *selectedIdx = -1;
+  DrawText("Select Song", screenW / 2 - MeasureText("Select Song", 36) / 2, 60,
+           36, YELLOW);
+  for (int i = 0; i < songCount; i++) {
+    float x = (float)screenW / 2 - (float)btnW / 2;
+    float y = (float)baseY + (float)i * ((float)btnH + (float)spacing);
+    if (GuiButton((Rectangle){x, y, (float)btnW, (float)btnH}, songNames[i])) {
+      *selectedIdx = i;
+    }
+  }
+  if (GuiButton((Rectangle){(float)screenW / 2 - 100.0f, (float)screenH - 80.0f,
+                            200.0f, 40.0f},
+                "Back")) {
+    *backPressed = true;
+  }
 }

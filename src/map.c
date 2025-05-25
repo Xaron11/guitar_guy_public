@@ -1,51 +1,65 @@
 #include "map.h"
+#include "game.h"
 #include "types.h"
 #include <stdio.h>
 #include <string.h>
 
-char songTitle[128] = "Unknown";
-char songArtist[128] = "Unknown";
-int resolution = 192;
-int tempo = 500000;
-float offset = 0.0f;
-
-extern Note notes[MAX_NOTES];
-extern int noteCount;
-
-void LoadMap(const char *filename) {
-  FILE *file = fopen(filename, "r");
-  if (!file) {
+void LoadMap(const char *filename, Song *song) {
+  char *text = LoadFileText(filename);
+  if (!text) {
     TraceLog(LOG_ERROR, "Failed to open map file");
     return;
   }
-  char line[256];
-  while (fgets(line, sizeof(line), file)) {
-    if (strstr(line, "Offset"))
-      sscanf(line, "Offset = %f", &offset);
-    else if (strstr(line, "Resolution"))
-      sscanf(line, "Resolution = %d", &resolution);
-    else if (strstr(line, "Tempo"))
-      sscanf(line, "Tempo = %d", &tempo);
-    else if (strstr(line, "Name"))
-      sscanf(line, "Name = \"%99[^\"]\"", songTitle);
-    else if (strstr(line, "Artist"))
-      sscanf(line, "Artist = \"%99[^\"]\"", songArtist);
-    else if (strstr(line, "= N")) {
+  // Reset song data
+  memset(song, 0, sizeof(Song));
+  strcpy(song->title, "Unknown");
+  strcpy(song->artist, "Unknown");
+  song->resolution = 192;
+  song->tempo = 500000;
+  song->offset = 0.0f;
+  song->noteCount = 0;
+
+  int inTrackSection = 0;
+  int currNote = 0;
+  char *saveptr = NULL;
+  const char *line = strtok_r(text, "\n", &saveptr);
+  while (line) {
+    if (strstr(line, "[Track]")) {
+      inTrackSection = 1;
+      line = strtok_r(NULL, "\n", &saveptr);
+      continue;
+    }
+    if (inTrackSection && line[0] == '[')
+      break;
+    if (!inTrackSection) {
+      if (strstr(line, "Name"))
+        sscanf(line, "Name = \"%99[^\"]\"", song->title);
+      else if (strstr(line, "Artist"))
+        sscanf(line, "Artist = \"%99[^\"]\"", song->artist);
+      else if (strstr(line, "Offset"))
+        sscanf(line, "Offset = %f", &song->offset);
+      else if (strstr(line, "Resolution"))
+        sscanf(line, "Resolution = %d", &song->resolution);
+      else if (strstr(line, "Tempo"))
+        sscanf(line, "Tempo = %d", &song->tempo);
+      else if (strstr(line, "Difficulty"))
+        sscanf(line, "Difficulty = %d", &song->difficulty);
+      else if (strstr(line, "Notes"))
+        sscanf(line, "Notes = %d", &song->noteCount);
+    } else if (strstr(line, "= N")) {
       int tick = 0;
       int column = 0;
-      if (sscanf(line, "%d = N %d", &tick, &column) == 2) {
-        if (noteCount < MAX_NOTES && column >= 0 && column < NUM_COLUMNS) {
-          if (resolution <= 0) {
-            TraceLog(LOG_ERROR, "Invalid resolution: %d", resolution);
-            fclose(file);
-            return;
-          }
-          float beat = (float)tick / resolution;
-          float seconds = ((float)tempo / 1000000.0f) * beat + offset;
-          notes[noteCount++] = (Note){column, seconds, true};
-        }
+      if (sscanf(line, "%d = N %d", &tick, &column) == 2 &&
+          currNote < song->noteCount && column >= 0 && column < NUM_COLUMNS &&
+          song->resolution > 0) {
+        float beat = (float)tick / (float)song->resolution;
+        float seconds = ((float)song->tempo / 1000000.0f) * beat + song->offset;
+        song->notes[currNote++] = (Note){column, seconds, true};
       }
     }
+    line = strtok_r(NULL, "\n", &saveptr);
   }
-  fclose(file);
+
+  CalculateSongDuration(song);
+  UnloadFileText(text);
 }

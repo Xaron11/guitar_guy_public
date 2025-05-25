@@ -1,31 +1,12 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <stdbool.h>
-
 #include "types.h"
 
-#define BASE_SCORE 100
-#define DEFAULT_SONG_OFFSET 3.0f
-
-void UpdateInput(float delta);
-extern int score;
-extern float songTime;
-extern float songDuration;
-extern float keyTimers[NUM_COLUMNS];
-extern bool keyHitVisual[NUM_COLUMNS];
-extern float keyHitTimers[NUM_COLUMNS];
-extern Note notes[MAX_NOTES];
-extern int noteCount;
-
-// Combo and multiplier
-extern int combo;
-extern int multiplier;
-int GetCombo(void);
-int GetMultiplier(void);
-void GameReset(void);
-void CalculateSongDuration(void);
-float GetSongProgress(void);
-bool IsSongFinished(void);
+void UpdateInput(GameStateData *state, float delta);
+void GameReset(GameStateData *state);
+void CalculateSongDuration(Song *song);
+float GetSongProgress(const GameStateData *state);
+bool IsSongFinished(const GameStateData *state);
 
 #endif  // GAME_H

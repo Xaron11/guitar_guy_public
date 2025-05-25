@@ -1,11 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
+#include "types.h"
 
-void LoadMap(const char *filename);
-extern char songTitle[128];
-extern char songArtist[128];
-extern int resolution;
-extern int tempo;
-extern float offset;
+void LoadMap(const char *filename, Song *song);
 
 #endif  // MAP_H
