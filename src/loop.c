@@ -1,6 +1,7 @@
+#include "scores.h"
 #define RAYGUI_IMPLEMENTATION
-#include "loop.h"
 #include "gamestate.h"
+#include "loop.h"
 #include "raygui.h"
 #include <raylib.h>
 
@@ -12,12 +13,14 @@ extern char songArtist[128];
 void GameLoop(void) {
   GameContext ctx = {0};
   ScanAvailableSongs(&ctx);
+  LoadHighscores(&ctx.highscores, "assets/scores.csv");
   GameState state = STATE_MENU;
   int resumeCountdown = 0;
   float resumeTimer = 0.0f;
   bool shouldExit = false;
   int selectedSongIdx = -1;
   bool backToMenu = false;
+  int currentHighscore = 0;
 
   while (!WindowShouldClose() && !shouldExit) {
     BeginDrawing();
@@ -39,10 +42,7 @@ void GameLoop(void) {
         SetCurrentSong(&ctx, selectedSongIdx);
         selectedSongIdx = -1;
       }
-      state = HandlePlayingState(&ctx);
-      if (state == STATE_MENU && ctx.songLoaded == false) {
-        state = STATE_RESULTS;
-      }
+      state = HandlePlayingState(&ctx, &currentHighscore);
       break;
     case STATE_PAUSED:
       state = HandlePausedState(&ctx, &resumeCountdown, &resumeTimer);
@@ -51,7 +51,7 @@ void GameLoop(void) {
       state = HandleResumeState(&ctx, &resumeCountdown, &resumeTimer);
       break;
     case STATE_RESULTS:
-      state = HandleResultsState(&ctx);
+      state = HandleResultsState(&ctx, currentHighscore);
       break;
     }
     EndDrawing();

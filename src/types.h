@@ -12,6 +12,7 @@
 #define MAX_NOTES 2048
 #define HIT_FEEDBACK_TIME 0.2f
 #define KEY_DELAY 0.2f
+#define MAX_SONGS 128
 
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
@@ -51,6 +52,18 @@ typedef struct {
   size_t count;
 } SongList;
 
+// Highscore entry
+typedef struct {
+  char filename[256];
+  int highscore;
+} HighscoreEntry;
+
+// Highscore list
+typedef struct {
+  HighscoreEntry entries[MAX_SONGS];
+  int count;
+} HighscoreList;
+
 // State for the current game session
 typedef struct {
   int score;
@@ -70,6 +83,7 @@ typedef struct {
   GameStateData gameState;
   int currentSongIdx;
   bool songLoaded;
+  HighscoreList highscores;
 } GameContext;
 
 #endif  // TYPES_H

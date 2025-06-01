@@ -3,6 +3,7 @@
 #include "game.h"
 #include "loop.h"
 #include "map.h"
+#include "scores.h"
 #include "types.h"
 #include <raylib.h>
 #include <stddef.h>
@@ -94,7 +95,6 @@ void SetCurrentSong(GameContext *ctx, int songIdx) {
 }
 
 GameState HandleMenuState(const GameContext *ctx, bool *shouldExit) {
-  (void)ctx; // Unused
   bool playPressed = false;
   bool exitPressed = false;
   DrawMainMenu(&playPressed, &exitPressed);
@@ -130,7 +130,7 @@ GameState HandleLevelSelectState(const GameContext *ctx, bool *backToMenu,
     return STATE_MENU;
   }
   bool backPressed = false;
-  DrawLevelSelectMenu(labelPtrs, shownCount, &selectedIdx, &backPressed);
+  DrawLevelSelectMenu(ctx, labelPtrs, shownCount, &selectedIdx, &backPressed);
   if (selectedIdx >= 0 && selectedIdx < list->count) {
     *selectedSongIdx = selectedIdx;
     selectedIdx = -1;
@@ -142,7 +142,7 @@ GameState HandleLevelSelectState(const GameContext *ctx, bool *backToMenu,
   return STATE_LEVEL_SELECT;
 }
 
-GameState HandlePlayingState(GameContext *ctx) {
+GameState HandlePlayingState(GameContext *ctx, int *currentHighscore) {
   if (!ctx->songLoaded && ctx->currentSongIdx >= 0 &&
       ctx->currentSongIdx < ctx->songList.count) {
     LoadMap(ctx->songList.entries[ctx->currentSongIdx].path,
@@ -163,8 +163,17 @@ GameState HandlePlayingState(GameContext *ctx) {
   DrawButtons(&ctx->gameState, true);
   DrawNotes(&ctx->gameState);
   if (IsSongFinished(&ctx->gameState)) {
+    *currentHighscore = GetHighscore(
+        &ctx->highscores, ctx->songList.entries[ctx->currentSongIdx].path);
+    if (ctx->gameState.score > *currentHighscore) {
+      *currentHighscore = ctx->gameState.score;
+      SetHighscore(&ctx->highscores,
+                   ctx->songList.entries[ctx->currentSongIdx].path,
+                   ctx->gameState.score);
+      SaveHighscores(&ctx->highscores, "assets/scores.csv");
+    }
     ctx->songLoaded = false;
-    return STATE_MENU;
+    return STATE_RESULTS;
   }
   return STATE_PLAYING;
 }
@@ -211,9 +220,10 @@ GameState HandleResumeState(const GameContext *ctx, int *resumeCountdown,
   }
 }
 
-GameState HandleResultsState(GameContext *ctx) {
+GameState HandleResultsState(GameContext *ctx, int currentHighscore) {
   bool menuPressed = false;
-  DrawResultsScreen(&ctx->gameState, &menuPressed);
+
+  DrawResultsScreen(&ctx->gameState, &menuPressed, currentHighscore);
   if (menuPressed) {
     ctx->songLoaded = false;
     return STATE_MENU;

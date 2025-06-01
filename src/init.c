@@ -1,5 +1,6 @@
 #include "init.h"
 #include "raygui.h"
+#include "scores.h"
 #include "types.h"
 #include <raylib.h>
 

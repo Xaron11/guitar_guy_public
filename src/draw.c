@@ -1,6 +1,7 @@
 #include "draw.h"
 #include "game.h"
 #include "raygui.h"
+#include "scores.h"
 #include "types.h"
 #include <raylib.h>
 #include <stdio.h>
@@ -126,8 +127,8 @@ void DrawMainMenu(bool *playPressed, bool *exitPressed) {
   GuiSetStyle(DEFAULT, TEXT_SIZE, prevStyle);
 }
 
-void DrawLevelSelectMenu(const char **songNames, int songCount,
-                         int *selectedIdx, bool *backPressed) {
+void DrawLevelSelectMenu(const GameContext *ctx, const char **songNames,
+                         int songCount, int *selectedIdx, bool *backPressed) {
   int screenW = GetScreenWidth();
   int screenH = GetScreenHeight();
   int btnW = 400;
@@ -141,7 +142,10 @@ void DrawLevelSelectMenu(const char **songNames, int songCount,
   for (int i = 0; i < songCount; i++) {
     float x = (float)screenW / 2 - (float)btnW / 2;
     float y = (float)baseY + (float)i * ((float)btnH + (float)spacing);
-    if (GuiButton((Rectangle){x, y, (float)btnW, (float)btnH}, songNames[i])) {
+    char label[512];
+    snprintf(label, sizeof(label), "%s  (Highscore: %d)", songNames[i],
+             GetHighscore(&ctx->highscores, ctx->songList.entries[i].path));
+    if (GuiButton((Rectangle){x, y, (float)btnW, (float)btnH}, label)) {
       *selectedIdx = i;
     }
   }
@@ -152,7 +156,8 @@ void DrawLevelSelectMenu(const char **songNames, int songCount,
   }
 }
 
-void DrawResultsScreen(const GameStateData *state, bool *menuPressed) {
+void DrawResultsScreen(const GameStateData *state, bool *menuPressed,
+                       int highscore) {
   DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.7f));
   int centerX = GetScreenWidth() / 2;
   int y = 120;
@@ -168,6 +173,11 @@ void DrawResultsScreen(const GameStateData *state, bool *menuPressed) {
                MeasureText(TextFormat("Max Combo: %d", state->maxCombo), 28) /
                    2,
            y, 28, ORANGE);
+  y += 40;
+  DrawText(TextFormat("Highscore: %d", highscore),
+           centerX -
+               MeasureText(TextFormat("Highscore: %d", highscore), 28) / 2,
+           y, 28, GREEN);
   y += 40;
   Rectangle btn = {(float)(centerX - 100), (float)y, 200.0f, 50.0f};
   *menuPressed = GuiButton(btn, "Return to Menu");

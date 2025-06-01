@@ -15,8 +15,9 @@ void DrawPauseOverlay(void);
 void DrawPauseOverlayWithExit(bool *exitPressed);
 void DrawResumeCountdown(int seconds);
 void DrawMainMenu(bool *playPressed, bool *exitPressed);
-void DrawLevelSelectMenu(const char **songNames, int songCount,
-                         int *selectedIdx, bool *backPressed);
-void DrawResultsScreen(const GameStateData *state, bool *menuPressed);
+void DrawLevelSelectMenu(const GameContext *ctx, const char **songNames,
+                         int songCount, int *selectedIdx, bool *backPressed);
+void DrawResultsScreen(const GameStateData *state, bool *menuPressed,
+                       int highscore);
 
 #endif  // DRAW_H
