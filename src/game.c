@@ -18,6 +18,7 @@ void CalculateSongDuration(Song *song) {
 void GameReset(GameStateData *state) {
   state->score = 0;
   state->combo = 0;
+  state->maxCombo = 0;
   state->multiplier = 1;
   state->songTime = -(state->currentSong.offset + DEFAULT_SONG_OFFSET);
   for (int i = 0; i < NUM_COLUMNS; i++) {
@@ -64,6 +65,8 @@ static bool TryHitNote(GameStateData *state, int col) {
     if (dt < HIT_WINDOW / 300.0f && dt > -HIT_WINDOW / 300.0f) {
       state->currentSong.notes[j].active = false;
       state->combo++;
+      if (state->combo > state->maxCombo)
+        state->maxCombo = state->combo;
       if (state->combo >= comboThresholds[2])
         state->multiplier = 4;
       else if (state->combo >= comboThresholds[1])

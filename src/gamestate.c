@@ -210,3 +210,13 @@ GameState HandleResumeState(const GameContext *ctx, int *resumeCountdown,
     return STATE_PLAYING;
   }
 }
+
+GameState HandleResultsState(GameContext *ctx) {
+  bool menuPressed = false;
+  DrawResultsScreen(&ctx->gameState, &menuPressed);
+  if (menuPressed) {
+    ctx->songLoaded = false;
+    return STATE_MENU;
+  }
+  return STATE_RESULTS;
+}

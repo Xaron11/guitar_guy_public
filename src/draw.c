@@ -88,8 +88,9 @@ void DrawPauseOverlayWithExit(bool *exitPressed) {
   DrawText("Press ESC to resume",
            GetScreenWidth() / 2 - MeasureText("Press ESC to resume", 24) / 2,
            GetScreenHeight() / 2 + 40, 24, GRAY);
-  *exitPressed = GuiButton((Rectangle){10, GetScreenHeight() - 60, 200, 50},
-                           "EXIT TO MENU");
+  *exitPressed = GuiButton(
+      (Rectangle){10.0f, (float)(GetScreenHeight() - 60), 200.0f, 50.0f},
+      "Exit to Menu");
 }
 
 void DrawResumeCountdown(int seconds) {
@@ -149,4 +150,25 @@ void DrawLevelSelectMenu(const char **songNames, int songCount,
                 "Back")) {
     *backPressed = true;
   }
+}
+
+void DrawResultsScreen(const GameStateData *state, bool *menuPressed) {
+  DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.7f));
+  int centerX = GetScreenWidth() / 2;
+  int y = 120;
+  DrawText("SONG COMPLETE!", centerX - MeasureText("SONG COMPLETE!", 40) / 2, y,
+           40, YELLOW);
+  y += 60;
+  DrawText(TextFormat("Score: %d", state->score),
+           centerX - MeasureText(TextFormat("Score: %d", state->score), 32) / 2,
+           y, 32, WHITE);
+  y += 40;
+  DrawText(TextFormat("Max Combo: %d", state->maxCombo),
+           centerX -
+               MeasureText(TextFormat("Max Combo: %d", state->maxCombo), 28) /
+                   2,
+           y, 28, ORANGE);
+  y += 40;
+  Rectangle btn = {(float)(centerX - 100), (float)y, 200.0f, 50.0f};
+  *menuPressed = GuiButton(btn, "Return to Menu");
 }

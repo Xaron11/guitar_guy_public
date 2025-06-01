@@ -17,5 +17,6 @@ void DrawResumeCountdown(int seconds);
 void DrawMainMenu(bool *playPressed, bool *exitPressed);
 void DrawLevelSelectMenu(const char **songNames, int songCount,
                          int *selectedIdx, bool *backPressed);
+void DrawResultsScreen(const GameStateData *state, bool *menuPressed);
 
 #endif  // DRAW_H

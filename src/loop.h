@@ -6,7 +6,8 @@ typedef enum {
   STATE_LEVEL_SELECT,
   STATE_PLAYING,
   STATE_PAUSED,
-  STATE_RESUME
+  STATE_RESUME,
+  STATE_RESULTS
 } GameState;
 
 void GameLoop(void);

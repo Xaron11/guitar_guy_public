@@ -56,6 +56,7 @@ typedef struct {
   int score;
   float songTime;
   int combo;
+  int maxCombo;
   int multiplier;
   float keyTimers[NUM_COLUMNS];
   bool keyHitVisual[NUM_COLUMNS];

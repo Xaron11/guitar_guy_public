@@ -17,6 +17,7 @@ GameState HandleResumeState(const GameContext *ctx, int *resumeCountdown,
                             float *resumeTimer);
 GameState HandleLevelSelectState(const GameContext *ctx, bool *backToMenu,
                                  int *selectedSongIdx);
+GameState HandleResultsState(GameContext *ctx);
 void SetCurrentSong(GameContext *ctx, int songIdx);
 
 #endif  // GAMESTATE_H

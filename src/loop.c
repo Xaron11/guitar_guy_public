@@ -40,12 +40,18 @@ void GameLoop(void) {
         selectedSongIdx = -1;
       }
       state = HandlePlayingState(&ctx);
+      if (state == STATE_MENU && ctx.songLoaded == false) {
+        state = STATE_RESULTS;
+      }
       break;
     case STATE_PAUSED:
       state = HandlePausedState(&ctx, &resumeCountdown, &resumeTimer);
       break;
     case STATE_RESUME:
       state = HandleResumeState(&ctx, &resumeCountdown, &resumeTimer);
+      break;
+    case STATE_RESULTS:
+      state = HandleResultsState(&ctx);
       break;
     }
     EndDrawing();
