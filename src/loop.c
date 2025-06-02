@@ -5,11 +5,6 @@
 #include "raygui.h"
 #include <raylib.h>
 
-extern int score;
-extern float songTime;
-extern char songTitle[128];
-extern char songArtist[128];
-
 void GameLoop(void) {
   GameContext ctx = {0};
   ScanAvailableSongs(&ctx);

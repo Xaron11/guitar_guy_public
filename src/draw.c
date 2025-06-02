@@ -103,7 +103,7 @@ void DrawResumeCountdown(int seconds) {
 }
 
 void DrawMainMenu(bool *playPressed, bool *exitPressed) {
-  const char *title = "C-GAME";
+  const char *title = "gUITAR gUY";
   int titleFontSize = 64;
   int btnWidth = 200;
   int btnHeight = 60;
@@ -112,8 +112,9 @@ void DrawMainMenu(bool *playPressed, bool *exitPressed) {
   int exitBtnY = btnY + btnHeight + 30;
   DrawText(title, GetScreenWidth() / 2 - MeasureText(title, titleFontSize) / 2,
            100, titleFontSize, YELLOW);
-  DrawText("A simple rhythm game",
-           GetScreenWidth() / 2 - MeasureText("A simple rhythm game", 24) / 2,
+  DrawText("Dawid Kaczmarzyk & Mateusz Borucki",
+           GetScreenWidth() / 2 -
+               MeasureText("Dawid Kaczmarzyk & Mateusz Borucki", 24) / 2,
            180, 24, GRAY);
 
   int prevStyle = GuiGetStyle(DEFAULT, TEXT_SIZE);
@@ -127,12 +128,51 @@ void DrawMainMenu(bool *playPressed, bool *exitPressed) {
   GuiSetStyle(DEFAULT, TEXT_SIZE, prevStyle);
 }
 
+typedef struct {
+  float x;
+  float y;
+  float w;
+  float h;
+  const char *line1;
+  Color color1;
+  const char *line2;
+  Color color2;
+} LevelSelectButtonParams;
+
+static bool DrawLevelSelectButton(const LevelSelectButtonParams *params,
+                                  bool *hovered) {
+  Vector2 mouse = GetMousePosition();
+  Rectangle rect = {params->x, params->y, params->w, params->h};
+  bool isHover = CheckCollisionPointRec(mouse, rect);
+  if (hovered)
+    *hovered = isHover;
+  bool isClick = isHover && IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+
+  Color bg = isHover ? Fade(GetColor(0xFFD700FF), 0.8f)
+                     : Fade(GetColor(0xFFFF00FF), 0.9f);
+  Color border = isHover ? LIGHTGRAY : DARKGRAY;
+  DrawRectangleRounded(rect, 0.22f, 8, bg);
+  DrawRectangleRoundedLines(rect, 0.22f, 8, border);
+
+  int fontSize1 = 22;
+  int fontSize2 = 18;
+  int text1W = MeasureText(params->line1, fontSize1);
+  int text2W = MeasureText(params->line2, fontSize2);
+  int text1X = (int)(params->x + params->w / 2.0f - (float)text1W / 2.0f);
+  int text2X = (int)(params->x + params->w / 2.0f - (float)text2W / 2.0f);
+  int text1Y = (int)(params->y + params->h / 2.0f - (float)fontSize1 + 2.0f);
+  int text2Y = (int)(params->y + params->h / 2.0f + 8.0f);
+  DrawText(params->line1, text1X, text1Y, fontSize1, params->color1);
+  DrawText(params->line2, text2X, text2Y, fontSize2, params->color2);
+  return isClick;
+}
+
 void DrawLevelSelectMenu(const GameContext *ctx, const char **songNames,
                          int songCount, int *selectedIdx, bool *backPressed) {
   int screenW = GetScreenWidth();
   int screenH = GetScreenHeight();
   int btnW = 400;
-  int btnH = 48;
+  int btnH = 90;
   int spacing = 16;
   int totalH = songCount * (btnH + spacing) - spacing;
   int baseY = screenH / 2 - totalH / 2;
@@ -140,17 +180,22 @@ void DrawLevelSelectMenu(const GameContext *ctx, const char **songNames,
   DrawText("Select Song", screenW / 2 - MeasureText("Select Song", 36) / 2, 60,
            36, YELLOW);
   for (int i = 0; i < songCount; i++) {
-    float x = (float)screenW / 2 - (float)btnW / 2;
+    float x = (float)screenW / 2.0f - (float)btnW / 2.0f;
     float y = (float)baseY + (float)i * ((float)btnH + (float)spacing);
-    char label[512];
-    snprintf(label, sizeof(label), "%s  (Highscore: %d)", songNames[i],
-             GetHighscore(&ctx->highscores, ctx->songList.entries[i].path));
-    if (GuiButton((Rectangle){x, y, (float)btnW, (float)btnH}, label)) {
+    const char *songLabel = songNames[i];
+    int highscore =
+        GetHighscore(&ctx->highscores, ctx->songList.entries[i].path);
+    char scoreLabel[64];
+    snprintf(scoreLabel, sizeof(scoreLabel), "Highscore: %d", highscore);
+    bool hovered = false;
+    LevelSelectButtonParams btn = {x,         y,     (float)btnW, (float)btnH,
+                                   songLabel, BLACK, scoreLabel,  DARKGRAY};
+    if (DrawLevelSelectButton(&btn, &hovered)) {
       *selectedIdx = i;
     }
   }
-  if (GuiButton((Rectangle){(float)screenW / 2 - 100.0f, (float)screenH - 80.0f,
-                            200.0f, 40.0f},
+  if (GuiButton((Rectangle){(float)screenW / 2.0f - 100.0f,
+                            (float)screenH - 80.0f, 200.0f, 40.0f},
                 "Back")) {
     *backPressed = true;
   }
