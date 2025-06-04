@@ -51,4 +51,7 @@ void GameLoop(void) {
     }
     EndDrawing();
   }
+  if (ctx.songList.entries) {
+    free(ctx.songList.entries);
+  }
 }
