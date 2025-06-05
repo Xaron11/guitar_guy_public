@@ -60,8 +60,8 @@ This project uses **CMake**. You must have `raylib` installed or allow CMake to 
 #### Instructions
 
 ```bash
-git clone https://github.com/Xaron11/c_game.git
-cd c_game
+git clone https://github.com/Xaron11/guitar_guy_public.git
+cd guitar_guy
 mkdir build && cd build
 cmake ..
 cmake --build .
@@ -71,7 +71,7 @@ The game executable will be in `build/bin/`.
 #### Run
 ```bash
 cd bin
-./c_game
+./guitar_guy
 ```
 
 ## ⌨️ Controls
